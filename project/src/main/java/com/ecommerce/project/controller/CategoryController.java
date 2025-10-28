@@ -1,6 +1,7 @@
 package com.ecommerce.project.controller;
 
 import com.ecommerce.project.model.Category;
+import com.ecommerce.project.payload.CategoryDto;
 import com.ecommerce.project.payload.CategoryResponse;
 import com.ecommerce.project.services.CategoryService;
 import jakarta.validation.Valid;
@@ -25,23 +26,23 @@ public class CategoryController {
     }
 
     @PostMapping("/public/categories")
-    public ResponseEntity<String> createCategory(@Valid @RequestBody Category category) {
-        categoryService.createCategory(category);
-        return new ResponseEntity<>("Category added successfully", HttpStatus.CREATED);
+    public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto categoryDto) {
+        CategoryDto savedCategoryDto = categoryService.createCategory(categoryDto);
+        return new ResponseEntity<>(savedCategoryDto, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/admin/categories/{categoryId}")
-    public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<CategoryDto> deleteCategory(@PathVariable Long categoryId) {
 
-        String status = categoryService.deleteCategory(categoryId);
-        return new ResponseEntity<>(status, HttpStatus.OK);
+        CategoryDto deletedCategory = categoryService.deleteCategory(categoryId);
+        return new ResponseEntity<>(deletedCategory, HttpStatus.OK);
     }
 
     @PutMapping("/public/categories/{categoryId}")
-    public ResponseEntity<String> updateCategory(@Valid @RequestBody Category category,
+    public ResponseEntity<CategoryDto> updateCategory(@Valid @RequestBody CategoryDto categoryDto,
                                                  @PathVariable Long categoryId) {
 
-        String savedCategory = String.valueOf(categoryService.updateCategory(category, categoryId));
-        return new ResponseEntity<>("Category with categoryId " + categoryId, HttpStatus.CREATED);
+        CategoryDto savedCategoryDto = categoryService.updateCategory(categoryDto, categoryId);
+        return new ResponseEntity<>(savedCategoryDto, HttpStatus.CREATED);
     }
 }

@@ -40,37 +40,40 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public void createCategory(Category category) {
+    public CategoryDto createCategory(CategoryDto categoryDto) {
 
-        Category savedCategory = categoryRepository.findByCategoryName(category.getCategoryName());
-        if(savedCategory != null)
+        Category category = modelMapper.map(categoryDto, Category.class);
+        Category categoryFromDb = categoryRepository.findByCategoryName(category.getCategoryName());
+        if(categoryFromDb != null)
             throw new APIException("Category with this name "+category.getCategoryName()+" already exists !!");
-        categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(category);
+        CategoryDto savedCategoryDto = modelMapper.map(savedCategory, CategoryDto.class);
+        return savedCategoryDto;
     }
 
     @Override
-    public String deleteCategory(Long categoryId) {
+    public CategoryDto deleteCategory(Long categoryId) {
 
         List <Category> categories = categoryRepository.findAll();
 
-        Category catagory = categories.stream()
+        Category category = categories.stream()
                 .filter(c->c.getCategoryId().equals(categoryId))
                 .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
-        if(catagory==null)
-            return "Category not found";
 
-        categoryRepository.delete(catagory);
-        return "Category with "+categoryId+" deleted successfully";
+        categoryRepository.delete(category);
+        return modelMapper.map(category, CategoryDto.class);
     }
 
     @Override
-    public Category updateCategory(Category category, Long categoryId) {
+    public CategoryDto updateCategory(CategoryDto categoryDto, Long categoryId) {
 
         Category savedCategory = categoryRepository.findById(categoryId)
                         .orElseThrow(() -> new ResourceNotFoundException("Category with this Id not found"));
 
+        Category category = modelMapper.map(categoryDto, Category.class);
         category.setCategoryId(categoryId);
-       savedCategory = categoryRepository.save(category);
-       return savedCategory;
+        savedCategory = categoryRepository.save(category);
+
+       return modelMapper.map(savedCategory, CategoryDto.class);
     }
 }
