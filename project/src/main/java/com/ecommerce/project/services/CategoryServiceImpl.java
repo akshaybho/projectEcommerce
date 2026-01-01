@@ -76,7 +76,7 @@ public class CategoryServiceImpl implements CategoryService{
 
         Category category = categories.stream()
                 .filter(c->c.getCategoryId().equals(categoryId))
-                .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
+                .findFirst().orElseThrow(() -> new ResourceNotFoundException("Category with this Id not found"));
 
         categoryRepository.delete(category);
         return modelMapper.map(category, CategoryDto.class);

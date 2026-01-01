@@ -1,0 +1,17 @@
+package com.ecommerce.project.services;
+
+import com.ecommerce.project.model.Category;
+import com.ecommerce.project.model.Product;
+import com.ecommerce.project.payload.ProductDto;
+import com.ecommerce.project.payload.ProductResponse;
+
+import java.util.List;
+
+public interface ProductService {
+
+    ProductDto addProduct(Long categoryId, Product product);
+
+    List<ProductDto> getAll();
+
+    ProductResponse getProductByCategory(Long categoryId);
+}
