@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -39,5 +41,41 @@ public class ProductController {
 
         ProductResponse productResponse = productService.getProductByCategory(categoryId);
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/admin/product/{keywords}")
+    public ResponseEntity<List<ProductDto>> getProductsByKeyword(@PathVariable String keywords){
+
+        List<ProductDto> productDto = productService.getProdutByKeyword(keywords);
+        return new ResponseEntity<>(productDto, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/admin/product")
+    public ResponseEntity<String> deleteAllProducts(){
+        productService.deleteAll();
+        return new ResponseEntity<>("All products deleted successfully", HttpStatus.OK);
+    }
+    
+    @DeleteMapping("/admin/product/{productId}")
+    public ResponseEntity<String> deleteProductById(@PathVariable Long productId){
+        
+        productService.deleteProduct(productId);
+        return new ResponseEntity<>("Product with "+productId+" deleted successfully", HttpStatus.OK);
+    }
+
+    @PutMapping("/admin/product/{productId}")
+    public ResponseEntity<ProductDto> updateProduct(@RequestBody ProductDto productDto,
+                                                    @PathVariable Long productId){
+
+        ProductDto updatedProductdto = productService.updateProduct(productDto, productId);
+        return new ResponseEntity<>(updatedProductdto, HttpStatus.OK);
+    }
+
+    @PostMapping("/admin/product/{productId}/image")
+    public ResponseEntity<ProductDto> updateProductImage(@PathVariable Long productId,
+                                                         @RequestParam("image")MultipartFile image) throws IOException {
+
+        ProductDto updatedProduct = productService.updateProductImage(productId, image);
+        return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
     }
 }
