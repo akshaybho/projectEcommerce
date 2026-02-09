@@ -13,8 +13,6 @@ public interface ProductService {
 
     ProductDto addProduct(Long categoryId, Product product);
 
-    List<ProductDto> getAll();
-
     ProductResponse getProductByCategory(Long categoryId);
 
     List<ProductDto> getProdutByKeyword(String keyword);
@@ -26,4 +24,6 @@ public interface ProductService {
     ProductDto updateProduct(ProductDto productDto, Long productId);
 
     ProductDto updateProductImage(Long productId, MultipartFile image) throws IOException;
+
+    ProductResponse getAll(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 }

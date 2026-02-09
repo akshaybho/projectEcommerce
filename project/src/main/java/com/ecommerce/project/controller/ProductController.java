@@ -1,5 +1,6 @@
 package com.ecommerce.project.controller;
 
+import com.ecommerce.project.config.AppConstants;
 import com.ecommerce.project.model.Category;
 import com.ecommerce.project.model.Product;
 import com.ecommerce.project.payload.ProductDto;
@@ -30,10 +31,14 @@ public class ProductController {
     }
 
     @GetMapping("/admin/product")
-    public ResponseEntity<List<ProductDto>> getAllProducts(){
+    public ProductResponse getAllProducts(
+            @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_PRODUCTS_BY, required = false) String sortBy,
+            @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false) String sortOrder
+    ){
 
-        List<ProductDto> productDto = productService.getAll();
-        return new ResponseEntity<>(productDto, HttpStatus.OK);
+        return productService.getAll(pageNumber, pageSize, sortBy, sortOrder);
     }
 
     @GetMapping("/admin/{categoryId}/product")

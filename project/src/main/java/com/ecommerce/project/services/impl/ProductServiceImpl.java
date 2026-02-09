@@ -2,6 +2,7 @@ package com.ecommerce.project.services.impl;
 
 import com.ecommerce.project.categoryRepository.CategoryRepository;
 import com.ecommerce.project.categoryRepository.ProductRepository;
+import com.ecommerce.project.exceptions.APIException;
 import com.ecommerce.project.exceptions.ResourceNotFoundException;
 import com.ecommerce.project.model.Category;
 import com.ecommerce.project.model.Product;
@@ -12,6 +13,10 @@ import com.ecommerce.project.services.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +42,7 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private FileService fileService;
 
+
     @Override
     public ProductDto addProduct(Long categoryId, Product product) {
 
@@ -54,12 +60,33 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-   public List<ProductDto> getAll() {
+   public ProductResponse getAll(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
 
-        List <Product> list = productRepository.findAll();
+        Sort sortByAndOrder = sortOrder.equalsIgnoreCase("asc") ?
+        Sort.by(sortBy).ascending() :
+        Sort.by(sortBy).descending();
 
-        return list.stream().map(this::entityToDto)
-                .collect(Collectors.toList());
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+        Page <Product> productPage = productRepository.findAll(pageDetails);
+
+        List <Product> products = productPage.getContent();
+
+        if(products.isEmpty())
+            throw new APIException("No product created till now");
+
+            List <ProductDto> productDtos = products.stream()
+                    .map(product -> mapper.map(product, ProductDto.class))
+                    .toList();
+
+            ProductResponse productResponse = new ProductResponse();
+            productResponse.setContent(productDtos);
+            productResponse.setPageNumber(productPage.getNumber());
+            productResponse.setPageSize(productPage.getSize());
+            productResponse.setTotalElements(productPage.getTotalElements());
+            productResponse.setTotalPages(productPage.getTotalPages());
+            productResponse.setLastPage(productPage.isLast());
+
+        return productResponse;
     }
 
     @Override
@@ -145,7 +172,6 @@ public class ProductServiceImpl implements ProductService {
         //Return DTO after mapping the product DTO
         return mapper.map(updatedProduct, ProductDto.class);
     }
-
 
     //entity To Dto
     public ProductDto entityToDto(Product savedProduct){
